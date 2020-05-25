@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+        <meta name="theme-color" content="#ffffff">
+        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+
+        <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+        <title>quiz进入答题</title>
+        <script>
+            if ($.cookie("author") === undefined) {
+                window.location.href = "index.html"
+            }
+        </script>
+        <style>
+            #noNav {
+                margin: 30px auto;
+                width: 90%;
+            }
+
+            .att {
+                color: red;
+                font-size: 30px;
+            }
+
+            #buttons {
+                text-align: center;
+                margin-top: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin: 0 auto; width: 960px">
+            <div class="container paper">
+                <div>
+                    <p id="noNav">
+                        <span class="att">无尽答题模式：</span><br/><br/>
+                        每一题你有<span class="att">60</span>秒的回答时间，
+                        答对一题得<span class="att">5分</span>并进入下一题，<br/><br/>答错或者超时则<span class="att">答题结束</span>。
+                        <br/><br/>最终的得分为你答题错误后的统计得分
+                    </p>
+                </div>
+                <div id="buttons">
+                    <button onclick="window.location.href='choice.html'">开始答题</button>
+                    <br/><br/>
+                    <button onclick="window.location.href='rank.html'">返&emsp;&emsp;回</button>
+                </div>
+            </div>
+            <div id="nav"></div>
+            <script>
+                $("#nav").load("navigation.html")
+            </script>
+        </div>
+    </body>
+</html>

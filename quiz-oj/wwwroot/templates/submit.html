@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+        <meta name="theme-color" content="#ffffff">
+        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
+        <script src="https://cdn.bootcss.com/ace/1.4.2/ace.js"></script>
+        <script src="https://cdn.bootcss.com/ace/1.4.2/ext-language_tools.js"></script>
+        <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+
+        <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+
+        <title>quiz在线OJ</title>
+
+        <script>
+            var host = "http://47.101.33.252:4869"
+            if ($.cookie("author") === undefined) {
+                window.location.href = "index.html"
+            }
+            toastr.options = {
+                showDuration: 300,
+                hideDuration: 300,
+                timeOut: 2000
+            }
+        </script>
+
+        <style>
+            .container {
+                width: 100%;
+            }
+
+            #display {
+                width: 40%;
+                padding: 0px 10px 30px 20px;
+                margin-right: 30px;
+                float: left;
+            }
+
+            #details {
+                overflow: auto;
+                border: none;
+                border-radius: unset;
+                width: 100%;
+                height: 500px;
+                margin-top: 10px;
+                padding-bottom: 10px;
+            }
+
+            #details::-webkit-scrollbar {
+                background: transparent;
+                width: 7px;
+                border-radius: 5px;
+            }
+
+            #details::-webkit-scrollbar-thumb {
+                background-color: rgba(60, 63, 65, 0.4);
+                border-radius: 5px;
+            }
+
+            #details::-webkit-scrollbar-thumb:hover {
+                background-color: rgba(60, 63, 65, 0.8);
+            }
+
+            #inner {
+                border: 2px solid #41403e;
+                border-bottom-left-radius: 15px 255px;
+                border-bottom-right-radius: 225px 15px;
+                border-top-left-radius: 255px 15px;
+                border-top-right-radius: 15px 225px;
+                padding: 10px 10px 10px 10px;
+                height: 600px;
+                overflow: hidden;
+            }
+
+            .editor-header {
+                display: block;
+            }
+
+            .code {
+                width: 57%;
+                float: left;
+                height: 600px;
+            }
+
+            .section {
+                height: 30px;
+                font-size: 16px;
+                display: inline-block;
+                margin-bottom: 10px;
+                margin-top: 5px;
+                font-family: Consolas;
+                padding: 0;
+            }
+
+            .clearfix::after, .clearfix::before {
+                content: "";
+                display: block;
+                clear: both;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin: 0 auto; width: 100%">
+            <div class="container paper clearfix" style="max-width: 100%">
+                <div id="display">
+                    <h3>问题：</h3>
+                    <div id="inner">
+                        <span id="num"></span>
+                        <span id="title"></span>
+                        <span id="difficulty">难度：</span>
+                        <textarea id="details" readonly="readonly"></textarea>
+                    </div>
+                </div>
+
+                <div class="code">
+                    <h3>您的代码</h3>
+                    <form role="form">
+                        <div class="editor-header">
+                            <select class="form-control form-control-plus section" onchange="choiceBack(this)">
+                                <option>环境配色</option>
+                                <option value="ace/theme/xcode" selected="selected">高亮</option>
+                                <option value="ace/theme/monokai">暗色</option>
+                            </select>
+                            <select class="form-control form-control-plus section" onchange="choiceSJ(this)">
+                                <option value="4" selected="selected">代码缩进</option>
+                                <option>2</option>
+                                <option>4</option>
+                                <option>8</option>
+                            </select>
+                            <div class="flex-btn" onclick="expand('spanid')">
+                                <span class="glyphicon glyphicon-resize-full" id="spanid"></span>
+                            </div>
+                        </div>
+                    </form>
+                    <pre id="editor" style="height:500px">
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args){
+        Scanner s = new Scanner(System.in);
+
+    }
+}
+                </pre>
+                    <div>
+                        <input type="submit" id="submit" value="submit" onclick="submit()">
+                    </div>
+                </div>
+
+                <script>
+                    var editor = ace.edit("editor");  //该值为编辑框的id值
+                    window.onload = (function () {
+                        editor.setTheme("ace/theme/xcode"); //设置背景色为高亮
+                        editor.session.setMode("ace/mode/java");  //设置默认语言为c/c++
+                        editor.getSession().setTabSize(4);  //设置默认缩进大小
+                    })();
+
+                    //设置背景色
+                    function choiceBack(select) {
+                        editor.setTheme(select.value);
+                    }
+
+                    //设置缩进大小
+                    function choiceSJ(select) {
+                        editor.getSession().setTabSize(select.value);
+                    }
+
+                    function submit() {
+                        var code = editor.getValue();
+                        sub(code)
+                    }
+
+                    let diff = ""
+                    let details = document.getElementById("details")
+                    let num = document.getElementById("num")
+                    let title = document.getElementById("title")
+                    let difficulty = document.getElementById("difficulty")
+                    if (localStorage.getItem("code") !== "" && localStorage.getItem("code") !== undefined) {
+                        editor.setValue(localStorage.getItem("code"))
+                        localStorage.setItem("code", "")
+                    }
+                    $.get({
+                        url: host + "/api/oj/" + $.cookie("id"),
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("Authorization", $.cookie("author"));
+                        },
+                        success: function (data) {
+                            let detail = data.data
+                            let description = detail.description
+                            details.innerHTML = description
+                            num.innerHTML = $.cookie("id") + ". "
+                            title.innerHTML = detail.title
+                            if (detail.difficulty === 0) {
+                                diff = "easy"
+                            } else if (detail.difficulty === 1) {
+                                diff = "medium"
+                            } else {
+                                diff = "hard"
+                            }
+                            difficulty.innerHTML += diff
+                        },
+                        error: function () {
+                            alert("error")
+                        }
+                    })
+
+                    var sub = function (answer) {
+                        toastr.clear()
+                        toastr.info("正在提交，请不要重复操作")
+                        $.post({
+                            url: host + "/api/oj/submit",
+                            contentType: "application/json; charset=UTF-8",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("Authorization", $.cookie("author"));
+                            },
+                            data: JSON.stringify({
+                                id: parseInt(num.innerText),
+                                code: answer,
+                            }),
+                            success: function (data) {
+                                let result = data.data
+                                if (data.status === 10003) {
+                                    toastr.clear()
+                                    toastr.warning("您点击太快了，请先思考一下再提交")
+                                } else if (data.status === 10000) {
+                                    localStorage.setItem("code", answer)
+                                    if (result.pass === false) {
+                                        toastr.clear()
+                                        $.cookie("info", result.info)
+                                        window.location.href = "error.html"
+                                    } else {
+                                        window.location.href = "success.html"
+                                    }
+                                }
+                            }
+                        })
+                    }
+                </script>
+            </div>
+            <div id="nav" style="width: 100%"></div>
+            <script>
+                $("#nav").load("navigation.html")
+            </script>
+        </div>
+    </body>
+</html>

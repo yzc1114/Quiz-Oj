@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>quiz答题排行榜</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+        <meta name="theme-color" content="#ffffff">
+        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+
+        <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+
+        <script>
+            var host = "http://47.101.33.252:4869"
+            if ($.cookie("author") === undefined) {
+                window.location.href = "index.html"
+            }
+        </script>
+        <style>
+            .container {
+                background-color: rgb(250, 250, 250);
+            }
+
+            #oj {
+                float: left;
+                width: 47%;
+                margin-right: 20px;
+                border-radius: 20px;
+                margin-top: 30px;
+                padding: 10px;
+                background-color: white;
+                box-shadow: 0 0 20px 5px rgb(160, 160, 160);
+            }
+
+            #quiz {
+                float: left;
+                width: 47%;
+                border-radius: 20px;
+                margin-top: 30px;
+                padding: 10px;
+                background-color: white;
+                box-shadow: 0 0 20px 5px rgb(160, 160, 160);
+            }
+
+            #ojButton {
+                float: left;
+                width: 55%;
+                border: 1px solid black;
+                border-radius: 20px;
+                padding: 10px 10px 10px 20px;
+                margin-right: 20px;
+                background: linear-gradient(to bottom, rgb(255, 252, 67), rgb(255, 212, 121));
+                box-shadow: 0 0 20px 5px rgb(220, 220, 220);
+
+            }
+
+            #ojButton h4 {
+                letter-spacing: 0.5em;
+            }
+
+            #ojButton:hover {
+                cursor: pointer;
+                background: linear-gradient(to bottom, rgb(255, 255, 57), rgb(255, 252, 67));
+                box-shadow: 0 0 20px 5px rgb(180, 180, 180);
+            }
+
+            #opButton {
+                float: left;
+                width: 37%;
+                border: 1px solid black;
+                border-radius: 20px;
+                padding: 10px;
+                background: linear-gradient(to bottom, rgb(78, 226, 247), rgb(14, 150, 204));
+                box-shadow: 0 0 20px 5px rgb(220, 220, 220);
+            }
+
+            #opButton:hover {
+                cursor: pointer;
+                background: linear-gradient(to bottom, rgb(68, 206, 247), rgb(78, 226, 247));
+                box-shadow: 0 0 20px 5px rgb(180, 180, 180);
+            }
+
+            #ojRank {
+                text-align: right;
+            }
+
+            #quizRank {
+                text-align: right;
+            }
+
+            .clearfix::after, .clearfix::before {
+                content: "";
+                display: block;
+                clear: both;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin: 0 auto; width: 960px">
+            <div class="container paper clearfix">
+                <div id="buttons">
+                    <div id="ojButton">
+                        <h4>在线算法</h4>
+                        <p>在线算法测试，使用java语言，快来挑战你的算法极限</p>
+                    </div>
+                    <div id="opButton">
+                        <h4>选择速答</h4>
+                        <p>选择速答，无尽模式。题量丰富，比一比谁才是选择之王</p>
+                    </div>
+                </div>
+                <div id="oj">
+                    <h3>OJ排行榜</h3>
+                    <table id="ojRank">
+                        <tr>
+                            <th>#</th>
+                            <th>用户</th>
+                            <th>累计C题</th>
+                        </tr>
+                    </table>
+                </div>
+                <div id="quiz">
+                    <h3>答题排行榜</h3>
+                    <table id="quizRank">
+                        <tr>
+                            <th>#</th>
+                            <th>用户</th>
+                            <th>最高分</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="nav"></div>
+            <script>
+                $("#nav").load("navigation.html")
+            </script>
+        </div>
+        <script>
+            let ojRank = document.getElementById("ojRank")
+            let quizRank = document.getElementById("quizRank")
+            $.get({
+                url: host + "/api/oj/rank",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", $.cookie("author"));
+                },
+                data: {
+                    pageSize: 10,
+                    pageNum: 1
+                },
+                success: function (data) {
+                    if (data.status === 10000) {
+                        let result = data.data
+                        for (let i = 0; i < result.length; i++) {
+                            ojRank.innerHTML += "<tr>" +
+                                "<td>" + (i + 1) + "</td>" +
+                                "<td>" + result[i].username + "</td>" +
+                                "<td>" + result[i].passCount + "</td>" +
+                                "</tr>"
+                        }
+                    }
+                },
+                error: function () {
+                    alert("error")
+                }
+            })
+            $.get({
+                url: host + "/api/quiz/rank",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", $.cookie("author"));
+                },
+                data: {
+                    pageSize: 10,
+                    pageNum: 1
+                },
+                success: function (data) {
+                    if (data.status === 10000) {
+                        let result = data.data
+                        for (let i = 0; i < result.length; i++) {
+                            quizRank.innerHTML += "<tr>" +
+                                "<td>" + (i + 1) + "</td>" +
+                                "<td>" + result[i].username + "</td>" +
+                                "<td>" + result[i].score + "</td>" +
+                                "</tr>"
+                        }
+                    }
+                },
+                error: function () {
+                    alert("error")
+                }
+            })
+            $("#ojButton").click(function () {
+                window.location.href = "list.html"
+            })
+            $("#opButton").click(function () {
+                window.location.href = 'info.html'
+            })
+        </script>
+    </body>
+</html>

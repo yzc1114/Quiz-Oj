@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
+
+        <title>quiz注册</title>
+
+        <script>
+            var host = "http://47.101.33.252:4869"
+        </script>
+        <style>
+            input {
+                width: 300px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container paper">
+            <h2>用户注册</h2>
+            <form role="form">
+                用户邮箱: <input type="text" id="name" name="name"> <br>
+                用户密码: <input type="password" id="password" name="password"> <br>
+                确认密码: <input type="password" id="password1" name="password1"> <br>
+            </form>
+            <button type="submit" id="signup">注册</button>
+        </div>
+        <script>
+            $("#signup").click(function () {
+                var name = $("#name").val()
+                var password = $("#password").val()
+                var password1 = $("#password1").val()
+
+                if (password === password1) {
+                    $.post({
+                        url: host + "/auth/register",
+                        contentType: "application/json; charset=UTF-8",
+                        data: JSON.stringify({
+                            email: name,
+                            password
+                        }),
+                        success: function (data) {
+                            if (data.status === 10000) {
+                                toastr.success("我们已经将邮箱激活码发送到您的邮箱，请登录您的邮箱查看")
+                            } else {
+                                toastr.warning(data.msg)
+                            }
+                        }
+                    })
+                } else {
+                    toastr.error("请确认密码")
+                }
+            })
+        </script>
+    </body>
+</html>

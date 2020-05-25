@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+        <meta name="theme-color" content="#ffffff">
+        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+
+        <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+
+        <title>quiz回答正确</title>
+        <style>
+            .msg {
+                text-decoration: none;
+                color: rgb(65, 64, 62);
+            }
+
+            .msg:hover {
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin: 0 auto; width: 960px">
+            <div class="container paper">
+                <h2>恭喜你，完成了本题</h2>
+                <h5>可以以选择返回<a href="rank.html" class="msg">主菜单</a>或者返回<a href="list.html" class="msg">在线答题列表</a></h5>
+            </div>
+            <div id="nav"></div>
+            <script>
+                $("#nav").load("navigation.html")
+            </script>
+        </div>
+    </body>
+</html>

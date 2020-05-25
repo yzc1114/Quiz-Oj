@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+        <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+        <meta name="theme-color" content="#ffffff">
+        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+
+        <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+
+        <title>您的答案错误</title>
+        <style>
+            .clearfix::after, .clearfix::before {
+                content: "";
+                display: block;
+                clear: both;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin: 0 auto; width: 960px">
+            <div class="container paper clearfix">
+                <div style="width: 960px">
+                    <h2 class="text-danger">
+                        你的代码中有某些错误！！
+                    </h2>
+                </div>
+                <div>
+                    <h4>报错信息：</h4>
+                    <textarea id="wrong" style="text-indent: 2em; color: red; width: 100%; height: 200px"></textarea>
+                </div>
+                <script>
+                    let wrong = document.getElementById("wrong")
+                    wrong.innerHTML = $.cookie("info")
+                </script>
+            </div>
+            <div id="nav"></div>
+            <script>
+                $("#nav").load("navigation.html")
+            </script>
+        </div>
+    </body>
+</html>
