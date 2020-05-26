@@ -14,12 +14,17 @@
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
 
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+    
+        <script src="../static/js/common.js"></script>
         <script>
-            var host = "http://47.101.33.252:4869"
-            if ($.cookie("author") === undefined) {
-                window.location.href = "index.html"
-            }
+            $(function () {
+                checkIfLoggedIn(null, ()=>{
+                    window.location.href = "index.html"
+                })
+            })
+            // checkIfLoggedIn(null, ()=>{
+            //     window.location.href = "index.html"
+            // })
         </script>
         <style>
             .container {
@@ -101,12 +106,16 @@
         </style>
     </head>
     <body>
-        <div style="margin: 0 auto; width: 960px">
+        <div id="navhead"></div>
+        <script>
+            $("#navhead").load("navhead.html")
+        </script>
+        <div style="margin: 100px auto; width: 960px">
             <div class="container paper clearfix">
                 <div id="buttons">
                     <div id="ojButton">
                         <h4>在线算法</h4>
-                        <p>在线算法测试，使用java语言，快来挑战你的算法极限</p>
+                        <p>在线算法测试，使用c#语言，快来挑战你的算法极限</p>
                     </div>
                     <div id="opButton">
                         <h4>选择速答</h4>
@@ -143,21 +152,15 @@
             let ojRank = document.getElementById("ojRank")
             let quizRank = document.getElementById("quizRank")
             $.get({
-                url: host + "/api/oj/rank",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", $.cookie("author"));
-                },
-                data: {
-                    pageSize: 10,
-                    pageNum: 1
-                },
+                url: host + "/api/oj/rank/" + 1,
+                withCredentials: true,
                 success: function (data) {
-                    if (data.status === 10000) {
+                    if (data.code === 0 && data.data) {
                         let result = data.data
                         for (let i = 0; i < result.length; i++) {
                             ojRank.innerHTML += "<tr>" +
                                 "<td>" + (i + 1) + "</td>" +
-                                "<td>" + result[i].username + "</td>" +
+                                "<td>" + result[i].userName + "</td>" +
                                 "<td>" + result[i].passCount + "</td>" +
                                 "</tr>"
                         }
@@ -165,24 +168,18 @@
                 },
                 error: function () {
                     alert("error")
-                }
+                },
             })
             $.get({
-                url: host + "/api/quiz/rank",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", $.cookie("author"));
-                },
-                data: {
-                    pageSize: 10,
-                    pageNum: 1
-                },
+                url: host + "/api/quiz/rank/" + 1,
+                withCredentials: true,
                 success: function (data) {
-                    if (data.status === 10000) {
+                    if (data.code === 0 && data.data) {
                         let result = data.data
                         for (let i = 0; i < result.length; i++) {
                             quizRank.innerHTML += "<tr>" +
                                 "<td>" + (i + 1) + "</td>" +
-                                "<td>" + result[i].username + "</td>" +
+                                "<td>" + result[i].userName + "</td>" +
                                 "<td>" + result[i].score + "</td>" +
                                 "</tr>"
                         }

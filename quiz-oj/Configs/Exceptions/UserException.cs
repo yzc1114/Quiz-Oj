@@ -1,4 +1,10 @@
-$HEADER$namespace $NAMESPACE$
+using System;
+
+namespace quiz_oj.Configs.Exceptions
 {
-  public class $CLASS$ {$END$}
+    public class UserException : CodableException
+    {
+        public UserException(string msg) : base(msg) {}
+        public UserException(string msg, int code) : base(msg, code) { }
+    }
 }

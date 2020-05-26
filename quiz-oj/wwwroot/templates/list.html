@@ -16,12 +16,17 @@
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
 
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+        <script src="../static/js/common.js"></script>
         <script>
-            var host = "http://47.101.33.252:4869"
-            if ($.cookie("author") === undefined) {
-                window.location.href = "index.html"
+            function initAfterLoggedIn(){
+                getList(1);
             }
+            
+            $(function () {
+                checkIfLoggedIn(initAfterLoggedIn, ()=>{
+                    window.location.href = "index.html"
+                })
+            })
         </script>
         <style>
             #choose {
@@ -65,7 +70,11 @@
         <title>quiz问题列表</title>
     </head>
     <body>
-        <div style="margin: 0 auto; width: 960px">
+        <div id="navhead"></div>
+        <script>
+            $("#navhead").load("navhead.html")
+        </script>
+        <div style="margin: 100px auto; width: 960px">
             <div class="container paper">
                 <h1>问题列表</h1>
                 <table id="list">
@@ -75,6 +84,7 @@
                         <th>是否通过</th>
                         <th>难度系数</th>
                         <th>创建时间</th>
+                        <th>进入讨论</th>
                     </tr>
                 </table>
                 <div id="choose">
@@ -101,20 +111,19 @@
                 "<th>pass or not</th>" +
                 "<th>difficulty</th>" +
                 "<th>create time</th>" +
+                "<th>review</th>" +
                 "</tr>"
 
             function getList(pageNum) {
                 $.get({
-                    url: host + "/api/oj/list",
+                    url: host + "/api/oj/list/" + pageNum,
+                    withCredentials: true,
                     async: false,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", $.cookie("author"));
-                    },
-                    data: {
-                        pageSize: 10,
-                        pageNum: pageNum,
-                    },
                     success: function (data) {
+                        if(data.code !== 0){
+                            alert("error");
+                            return;
+                        }
                         var lists = data.data
                         let diff = ""
                         if (lists.length !== 0) {
@@ -127,12 +136,14 @@
                                 } else {
                                     diff = "hard"
                                 }
+                                var ojId = lists[i].id;
                                 list.innerHTML += "<tr>" +
-                                    "<td>" + lists[i].id + "</td>" +
-                                    "<td><a class='titles' id='" + lists[i].id + "' onclick='details(this.id)'>" + lists[i].title + "</a></td>" +
-                                    "<td>" + lists[i].pass.toString() + "</td>" +
+                                    "<td>" + lists[i].orderId + "</td>" +
+                                    "<td><a class='titles' id='" + lists[i].orderId + "' onclick='details(\"" + ojId + "\")'>" + lists[i].title + "</a></td>" +
+                                    "<td>" + lists[i].passed.toString() + "</td>" +
                                     "<td>" + diff + "</td>" +
                                     "<td>" + lists[i].createTime + "</td>" +
+                                    "<td><a class='titles' onclick='review(\"" + ojId + "\", \"" + lists[i].title + "\")'>Reviews</a></td>" +
                                     "</tr>"
                             }
                             nu = 1
@@ -145,8 +156,6 @@
                     }
                 })
             }
-
-            getList(1)
 
             $("#next").click(function () {
                 newPage = pageNum + 1
@@ -174,6 +183,11 @@
 
             $("#go").click(function () {
                 newPage = parseInt($("#page").val())
+                if(!Number.isInteger(newPage) || newPage <= 0){
+                    toastr.warning("不存在改页")
+                    $("#page").val(pageNum)
+                    return;
+                }
                 getList(newPage)
                 if (nu === 0) {
                     toastr.warning("不存在改页")
@@ -186,8 +200,14 @@
             })
 
             function details(id) {
-                $.cookie("id", id)
+                $.cookie("ojQuestionId", id)
                 window.location.href = "submit.html"
+            }
+            
+            function review(id, title){
+                $.cookie("ojQuestionId", id)
+                $.cookie("ojQuestionTitle", title)
+                window.location.href = "review.html"
             }
 
         </script>

@@ -1,10 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>nav</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+    <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
+
+    <script>
+    </script>
+
+    <style>
+        .container {
+            max-width: 100%;
+        }
+
+        #someButtons {
+            text-align: right;
+            float: right;
+        }
+
+        #toLast {
+            background-image: url("../static/bank.png");
+            border: 1px solid black;
+            width: 50px;
+            height: 50px;
+            border-radius: 50px;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+
+        #toRank {
+            background-image: url("../static/toRank.png");
+            background-repeat: no-repeat;
+            background-position: center center;
+            border: 1px solid black;
+            width: 50px;
+            height: 50px;
+            border-radius: 50px;
+            margin-right: 30px;
+        }
+
+        p {
+            float: left;
+        }
+
+        .clearfix::after, .clearfix::before {
+            content: "";
+            display: block;
+            clear: both;
+        }
+    </style>
 </head>
 <body>
-$END$
+<nav class="border fixed split-nav">
+    <div class="nav-brand">
+        <h3><a href="rank.html">Quiz-Oj</a></h3>
+    </div>
+    <div class="collapsible">
+        <input id="collapsible1" type="checkbox" name="collapsible1">
+        <button>
+            <label for="collapsible1">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+            </label>
+        </button>
+        <div class="collapsible-body">
+            <ul class="inline">
+                <li><a href="rank.html">首页</a></li>
+                <li><a href="upload.html">上传题目</a></li>
+                <li><a href="index.html?exit=1">退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 </body>
 </html>

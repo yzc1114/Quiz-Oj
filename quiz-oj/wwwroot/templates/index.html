@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -11,15 +11,29 @@
         <meta name="theme-color" content="#ffffff">
 
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
-        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
-        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-        <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
+        <script src="../static/js/jquery.min.js"></script>
+        <script src="../static/js/jquery.cookie.min.js"></script>
+        <script src="../static/js/toastr.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../static/css/toastr.min.css">
 
+        <script src="../static/js/common.js"></script>
+        
         <script>
-            var host = "http://47.101.33.252:4869"
+            $(function () {
+                var exit = window.location.href.getQuery("exit");
+                if(exit === "1"){
+                    $.get({
+                        url: host + "/api/auth/exit",
+                    });
+                    clearCookie();
+                }else{
+                    checkIfLoggedIn(function () {
+                        window.location.href = "rank.html";
+                    }, null)
+                }
+            })
         </script>
-
+        
         <title>quiz在线答题系统</title>
     </head>
     <body>
@@ -43,10 +57,10 @@
             </nav>
             <h3>简介(Brief Introduction)：</h3>
             <p class="text-primary">
-                quiz是一个简单的在线答题系统，我们开发了算法题以及选择题两个模块。算法题主要是acm的算法，使用java语言。选择题涉及各个方面的知识，希望能够开阔您的知识面<br/>
+                quiz是一个简单的在线答题系统，我们开发了算法题以及选择题两个模块。算法题主要是acm的算法，使用c#语言。选择题涉及各个方面的知识，希望能够开阔您的知识面<br/>
             </p>
             <h3>你可以从这里开始(Let's Start)</h3>
-            账户邮箱: <input type="text" id="name" name="name" value="" style="width: 300px"> <br>
+            账户昵称: <input type="text" id="name" name="name" value="" style="width: 300px"> <br>
             账户密码: <input type="password" id="password" name="password" value="" style="width: 300px"> <br>
             <button id="login">登&ensp;录</button>
             <button id="signUp">注&ensp;册</button>
@@ -56,35 +70,33 @@
                     var passwd = $("#password")
                     var accountName = name.val()
                     var password = passwd.val()
-                    if (!accountName || accountName == "") {
+                    if (!accountName || accountName === "") {
                         showMsg("请输入用户名");
                         name.focus();
-                    } else if (!password || password == "") {
+                    } else if (!password || password === "") {
                         showMsg("请输入密码");
                         passwd.focus();
                     } else {
                         //这里为用ajax获取用户信息并进行验证，如果账户密码不匹配则登录失败，如不需要验证用户信息，这段可不写
                         $.ajax({
-                            url: host + "/auth/login",// 获取自己系统后台用户信息接口
+                            url: host + "/api/auth/login",// 获取自己系统后台用户信息接口
                             contentType: "application/json; charset=UTF-8",
                             data: JSON.stringify({
-                                email: accountName,
-                                password: password,
+                                userName: accountName,
+                                pwd: password,
                             }),
                             type: "POST",
                             dataType: "json",
                             success: function (data, status, request) {
                                 console.log(data)
                                 if (data) {
-                                    if (data.status === 10000) { //判断返回值，这里根据的业务内容可做调整
-                                        var author = request.getResponseHeader("Authorization")
-                                        $.cookie("author", author)
+                                    if (data.code === 0 && data.data === true) { //判断返回值，这里根据的业务内容可做调整
                                         toastr.success("正在登录中...");
                                         setTimeout(function () {//做延时以便显示登录状态值\
                                             window.location.href = "rank.html";//指向登录的页面地址
                                         }, 1000)
                                     } else {
-                                        toastr.warning(data.msg);//显示登录失败的原因
+                                        toastr.warning(data.message);//显示登录失败的原因
                                         return false;
                                     }
                                 }

@@ -1,4 +1,13 @@
-$HEADER$namespace $NAMESPACE$
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace quiz_oj.Entities.OJ
 {
-  public class $CLASS$ {$END$}
+    [Table("OjSuccess")]
+    public class OjSuccess
+    {
+        [Column("userId")]
+        public string UserId { get; set; }
+        [Column("ojId")]
+        public string OjQuestionId { get; set; }
+    }
 }

@@ -14,7 +14,7 @@
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
 
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+        <script src="../static/js/common.js"></script>
         <title>quiz回答正确</title>
         <style>
             .msg {
@@ -28,7 +28,11 @@
         </style>
     </head>
     <body>
-        <div style="margin: 0 auto; width: 960px">
+        <div id="navhead"></div>
+        <script>
+            $("#navhead").load("navhead.html")
+        </script>
+        <div style="margin: 100px auto; width: 960px">
             <div class="container paper">
                 <h2>恭喜你，完成了本题</h2>
                 <h5>可以以选择返回<a href="rank.html" class="msg">主菜单</a>或者返回<a href="list.html" class="msg">在线答题列表</a></h5>

@@ -1,8 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using quiz_oj.Entities.OJ;
 
-namespace quiz_oj.Entities
+namespace quiz_oj.Entities.User
 {
     [Table("UserInfo")]
     public class UserInfo
@@ -11,14 +12,16 @@ namespace quiz_oj.Entities
         public string UserName { get; set; }
         [Column("id")]
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [Column("pwd")]
         public string Pwd { get; set; }
 
         public void ConvertToPublic()
         {
-            this.Id = -1;
+            this.Id = null;
             this.Pwd = null;
         } 
+        
+        public OjSuccessCount OjSuccessCount { get; set; }
     }
 }

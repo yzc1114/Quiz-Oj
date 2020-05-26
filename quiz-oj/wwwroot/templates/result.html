@@ -9,17 +9,19 @@
         <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
         <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
         <meta name="theme-color" content="#ffffff">
-        <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
-        <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script src="../static/js/jquery.min.js"></script>
+        <script src="../static/js/jquery.cookie.min.js"></script>
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
-
+        <script src="../static/js/toastr.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../static/css/toastr.min.css">
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+        <script src="../static/js/common.js"></script>
         <script>
-            var host = "http://47.101.33.252:4869"
-            if ($.cookie("author") === undefined) {
-                window.location.href = "index.html"
-            }
+            $(function () {
+                checkIfLoggedIn(null, ()=>{
+                    window.location.href = "index.html"
+                })
+            })
         </script>
         <style>
             #result {
@@ -87,29 +89,30 @@
                     <span id="result"></span>
                 </div>
             </div>
+            <div id="nav"></div>
+            <script>
+                $("#nav").load("navigation.html")
+            </script>
         </div>
-        <div class="container paper clearfix" style="max-width: 960px">
-            <p id="char">欢迎您：<span id="userName"></span></p>
-            <div id="someButtons">
-                <button id="toRank" onclick="window.location.href='rank.html'"></button>
-                <button id="toLast" onclick="window.location.href='info.html'"></button>
-            </div>
-        </div>
+<!--        <div class="container paper clearfix" style="max-width: 960px">-->
+<!--            <p id="char">欢迎您：<span id="userName"></span></p>-->
+<!--            <div id="someButtons">-->
+<!--                <button id="toRank" onclick="window.location.href='rank.html'"></button>-->
+<!--                <button id="toLast" onclick="window.location.href='info.html'"></button>-->
+<!--            </div>-->
+<!--        </div>-->
         <script>
-            $("#userName").html($.cookie("userName"))
 
             var result = document.getElementById("result")
             var num = document.getElementById("num")
             $.post({
                 url: host + "/api/quiz/result",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", $.cookie("author"));
-                },
-                success: function (data) {
-                    console.log(data)
-                    if (data.status === 10000) {
-                        result.innerHTML = data.data
-                        num.innerHTML = data.data / 5
+                withCredentials: true,
+                success: function (res) {
+                    console.log(res)
+                    if (res.code === 0) {
+                        result.innerHTML = res.data.score
+                        num.innerHTML = res.data.score / 5.
                     } else {
                         alert("您当前不在答题状态，点击确定返回答题首页")
                         window.location.href = "info.html"

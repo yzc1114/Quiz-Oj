@@ -1,4 +1,11 @@
-$HEADER$namespace $NAMESPACE$
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace quiz_oj.Configs.Exceptions
 {
-  public class $CLASS$ {$END$}
+    public class NonUserException : CodableException
+    {
+        public NonUserException(string message) : base(message) { }
+        public NonUserException(string message, int code) : base(message, code) { }
+    }
 }

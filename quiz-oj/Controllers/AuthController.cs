@@ -2,45 +2,84 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using quiz_oj.Entities;
+using quiz_oj.Entities.User;
+using quiz_oj.Service.interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace quiz_oj.Controllers
 {
-    [Route("api/[controller]")]
-    public class ValuesController : Controller
+    [ApiController]
+    [Route("api/[controller]/")]
+    public class AuthController : Controller
     {
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
+
+        private IAuthService authService;
+        private SessionUtils sessionUtils;
+        
+        public AuthController(IAuthService authService, SessionUtils sessionUtils)
         {
-            return new string[] { "value1", "value2" };
+            this.authService = authService;
+            this.sessionUtils = sessionUtils;
+        }
+        
+        [HttpPost("login")]
+        public async Task<bool> Login([FromBody] UserInfo userInfo)
+        {
+            var cached = sessionUtils.GetCachedUserInfo(HttpContext);
+            if (cached != null)
+            {
+                //已经登录
+                return true;
+            }
+            var res = await authService.ValidateUserInfo(userInfo);
+            if (res == null)
+            {
+                return false;
+            }
+            sessionUtils.SetSessionUserInfo(HttpContext, res);
+            return true;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("exit")]
+        public bool Exit()
         {
-            return "value";
+            sessionUtils.ClearString(HttpContext, "userId");
+            sessionUtils.ClearString(HttpContext, "userName");
+            return true;
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("register")]
+        public async Task<bool> Register([FromBody] UserInfo userInfo)
         {
+            return await authService.Register(userInfo);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpGet("checkUserNameExists/{name}")]
+        public async Task<bool> CheckUserNameExists([FromRoute] string name)
         {
+            return await authService.CheckUserNameExists(name);
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpGet("checkIfLoggedIn")]
+        public UserInfo CheckIfLoggedIn()
         {
+            return sessionUtils.GetCachedUserInfo(HttpContext);
+        }
+
+        [HttpGet("editUserName/{userName}")]
+        public async Task<bool> EditUserName([FromRoute] string userName)
+        {
+            var res = sessionUtils.GetCachedUserInfo(HttpContext);
+            if (res == null)
+            {
+                return false;
+            }
+            res.UserName = userName;
+            return await authService.EditUserName(res);
         }
     }
 }

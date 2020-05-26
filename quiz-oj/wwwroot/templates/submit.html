@@ -17,14 +17,20 @@
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
 
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+        
         <title>quiz在线OJ</title>
-
+        <script src="../static/js/common.js"></script>
         <script>
-            var host = "http://47.101.33.252:4869"
-            if ($.cookie("author") === undefined) {
-                window.location.href = "index.html"
-            }
+            $("#pendingAlert").hide();
+            $("#nonFailedAlert").hide();
+            $("#failedAlert").hide();
+            $(function () {
+                checkIfLoggedIn(function () {
+                    initOj();
+                }, ()=>{
+                    window.location.href = "index.html"
+                })
+            })
             toastr.options = {
                 showDuration: 300,
                 hideDuration: 300,
@@ -46,10 +52,10 @@
 
             #details {
                 overflow: auto;
-                border: none;
-                border-radius: unset;
+                /*#border: none;*/
+                /*#border-radius: unset;*/
                 width: 100%;
-                height: 500px;
+                height: 700px;
                 margin-top: 10px;
                 padding-bottom: 10px;
             }
@@ -70,13 +76,12 @@
             }
 
             #inner {
-                border: 2px solid #41403e;
-                border-bottom-left-radius: 15px 255px;
-                border-bottom-right-radius: 225px 15px;
-                border-top-left-radius: 255px 15px;
-                border-top-right-radius: 15px 225px;
+                /*border: 2px solid #41403e;*/
+                /*border-bottom-left-radius: 15px 255px;*/
+                /*border-bottom-right-radius: 225px 15px;*/
+                /*border-top-left-radius: 255px 15px;*/
+                /*border-top-right-radius: 15px 225px;*/
                 padding: 10px 10px 10px 10px;
-                height: 600px;
                 overflow: hidden;
             }
 
@@ -87,7 +92,6 @@
             .code {
                 width: 57%;
                 float: left;
-                height: 600px;
             }
 
             .section {
@@ -115,8 +119,8 @@
                     <div id="inner">
                         <span id="num"></span>
                         <span id="title"></span>
-                        <span id="difficulty">难度：</span>
-                        <textarea id="details" readonly="readonly"></textarea>
+                        <span class="badge secondary" id="difficulty">难度：</span>
+                        <p class="col border background-primary border-white" id="details" ></p>
                     </div>
                 </div>
 
@@ -141,25 +145,20 @@
                         </div>
                     </form>
                     <pre id="editor" style="height:500px">
-import java.util.*;
-
-public class Main {
-    public static void main(String[] args){
-        Scanner s = new Scanner(System.in);
-
-    }
-}
                 </pre>
+                    <div hidden id="pendingAlert" class="alert alert-secondary">Alert-secondary</div>
+                    <div hidden id="nonFailedAlert" class="alert alert-warning">Alert-secondary</div>
+                    <div hidden id="failedAlert" class="alert alert-danger">Alert-secondary</div>
                     <div>
                         <input type="submit" id="submit" value="submit" onclick="submit()">
                     </div>
                 </div>
 
                 <script>
-                    var editor = ace.edit("editor");  //该值为编辑框的id值
+                    let editor = ace.edit("editor");  //该值为编辑框的id值
                     window.onload = (function () {
                         editor.setTheme("ace/theme/xcode"); //设置背景色为高亮
-                        editor.session.setMode("ace/mode/java");  //设置默认语言为c/c++
+                        editor.session.setMode("ace/mode/csharp");  //设置默认语言为c/c++
                         editor.getSession().setTabSize(4);  //设置默认缩进大小
                     })();
 
@@ -182,61 +181,82 @@ public class Main {
                     let details = document.getElementById("details")
                     let num = document.getElementById("num")
                     let title = document.getElementById("title")
+                    
                     let difficulty = document.getElementById("difficulty")
-                    if (localStorage.getItem("code") !== "" && localStorage.getItem("code") !== undefined) {
-                        editor.setValue(localStorage.getItem("code"))
-                        localStorage.setItem("code", "")
+                    let ojId = $.cookie("ojQuestionId");
+                    if(ojId && ojId.length < 5){
+                        window.href.location = "index.html";
                     }
-                    $.get({
-                        url: host + "/api/oj/" + $.cookie("id"),
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("Authorization", $.cookie("author"));
-                        },
-                        success: function (data) {
-                            let detail = data.data
-                            let description = detail.description
-                            details.innerHTML = description
-                            num.innerHTML = $.cookie("id") + ". "
-                            title.innerHTML = detail.title
-                            if (detail.difficulty === 0) {
-                                diff = "easy"
-                            } else if (detail.difficulty === 1) {
-                                diff = "medium"
-                            } else {
-                                diff = "hard"
+                    
+                    function initOj(){
+                        $.get({
+                            url: host + "/api/oj/" + $.cookie("ojQuestionId"),
+                            withCredentials: true,
+                            success: function (data) {
+                                if(data.code !== 0 && data.data === null){
+                                    alert("error!")
+                                    return;
+                                }
+                                let detail = data.data;
+                                let description = detail.content;
+                                let code = detail.code;
+                                if (localStorage.getItem("code") !== "" && localStorage.getItem("code") !== undefined) {
+                                    editor.setValue(localStorage.getItem("code"))
+                                    localStorage.setItem("code", "")
+                                }else{
+                                    editor.setValue(code);
+                                }
+                                details.innerHTML = description;
+                                num.innerHTML = detail.orderId + ". ";
+                                title.innerHTML = detail.title;
+
+                                if (detail.difficulty === 0) {
+                                    diff = "easy"
+                                } else if (detail.difficulty === 1) {
+                                    diff = "medium"
+                                } else {
+                                    diff = "hard"
+                                }
+                                difficulty.innerHTML += diff
+                            },
+                            error: function () {
+                                alert("error")
                             }
-                            difficulty.innerHTML += diff
-                        },
-                        error: function () {
-                            alert("error")
-                        }
-                    })
+                        })
+                    }
 
                     var sub = function (answer) {
                         toastr.clear()
                         toastr.info("正在提交，请不要重复操作")
+                        showAlert("pending", "正在评估您的代码...");
                         $.post({
                             url: host + "/api/oj/submit",
                             contentType: "application/json; charset=UTF-8",
-                            beforeSend: function (xhr) {
-                                xhr.setRequestHeader("Authorization", $.cookie("author"));
-                            },
+                            withCredentials: true,
                             data: JSON.stringify({
-                                id: parseInt(num.innerText),
+                                ojQuestionId: $.cookie("ojQuestionId"),
                                 code: answer,
                             }),
                             success: function (data) {
+                                if(data.code !== 0){
+                                    alert("error!")
+                                    return;
+                                }
                                 let result = data.data
-                                if (data.status === 10003) {
+                                if(result.pending){
+                                    showAlert("pending", "正在评估您的代码...");
                                     toastr.clear()
-                                    toastr.warning("您点击太快了，请先思考一下再提交")
-                                } else if (data.status === 10000) {
+                                    toastr.warning("服务器正在运行代码，请勿重复提交！")
+                                }else{
                                     localStorage.setItem("code", answer)
-                                    if (result.pass === false) {
-                                        toastr.clear()
-                                        $.cookie("info", result.info)
-                                        window.location.href = "error.html"
-                                    } else {
+                                    if(result.pass !== true){
+                                        //没有通过，此时有可能是没有通过全部样例，也有可能是代码报错
+                                        if(result.failed){
+                                            showAlert("failed", "您的代码没有通过编译！报错信息：\n" + result.info);
+                                        }else{
+                                            showAlert("nonFailed", "您的代码没有通过全部样例！通过率为：" + result.successRate + "%");
+                                        }
+                                    }else{
                                         window.location.href = "success.html"
                                     }
                                 }
@@ -250,5 +270,41 @@ public class Main {
                 $("#nav").load("navigation.html")
             </script>
         </div>
+        
+    
+    <script>
+        var showModal = function(info){
+            var subTitle = $("#info-subtitle");
+            var modalInfo = $("#info-detail");
+            if(info.failed === false && info.successRate !== null){
+                subTitle.innerText = "您的代码没有通过全部样例！";
+                modalInfo.innerText = "通过率为：" + info.successRate + "%";
+            }else{
+                subTitle.innerText = "您的代码有错误！";
+                modalInfo.innerText = "报错信息：" + info.info + "%";
+            }
+        }
+        
+        var showAlert = function(type, str){
+            let pendingAlert = $("#pendingAlert");
+            let nonFailedAlert = $("#nonFailedAlert");
+            let failedAlert = $("#failedAlert");
+            // let pendingAlert = document.getElementById("pendingAlert");
+            // let nonFailedAlert = document.getElementById("nonFailedAlert");
+            // let failedAlert = document.getElementById("failedAlert");
+            pendingAlert.hide();
+            nonFailedAlert.hide();
+            failedAlert.hide();
+            switch (type) {
+                case "pending":
+                    pendingAlert.show(); pendingAlert.text(str); break;
+                case "nonFailed":
+                    nonFailedAlert.show(); nonFailedAlert.text(str); break;
+                case "failed":
+                    str = str.replace(/\n/g,'<br>')
+                    failedAlert.show(); failedAlert.html(str); break;
+            }
+        }
+    </script>
     </body>
 </html>

@@ -17,7 +17,6 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
 
         <script>
-            var host = "http://47.101.33.252:4869"
         </script>
 
         <style>
@@ -76,14 +75,10 @@
             window.history.back(-1)
         })
 
-        $.get({
-            url: host + "/api/user/me",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", $.cookie("author"));
-            },
-            success: function (data) {
-                $("#userName").html(data.data.username)
-                $.cookie("userName", data.data.username)
+        checkIfLoggedIn((userInfo)=>{
+            if(userInfo){
+                $("#userName").html(userInfo.userName)
+                $.cookie("userName", userInfo.userName)
             }
         })
 
@@ -92,26 +87,23 @@
             if (nameNew === "") {
                 toastr.warning("用户名不能为空")
             } else {
-                $.post({
-                    url: host + "/api/user/username",
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", $.cookie("author"));
-                    },
-                    data: {
-                        username: nameNew,
-                    },
-                    success: function (data) {
-                        if (data.status === 10000) {
-                            $("#userName").html(nameNew)
-                            toastr.success("修改成功")
-                        } else {
-                            toastr.warning("修改失败")
+                if(nameNew && nameNew !== ""){
+                    $.get({
+                        url: host + "/api/auth/editUserName/" + nameNew,
+                        success: function (data) {
+                            if (data.code === 0 && data.data === true) {
+                                $("#userName").html(nameNew);
+                                toastr.success("修改成功");
+                                $.cookie("userName", nameNew);
+                            } else {
+                                toastr.warning("修改失败")
+                            }
+                        },
+                        error: function () {
+                            alert("error")
                         }
-                    },
-                    error: function () {
-                        alert("error")
-                    }
-                })
+                    })
+                }
             }
         })
     </script>

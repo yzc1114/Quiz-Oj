@@ -16,12 +16,11 @@
         <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
         <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
-
+        
+        <script src="../static/js/common.js"></script>
+        
         <title>quiz注册</title>
-
-        <script>
-            var host = "http://47.101.33.252:4869"
-        </script>
+        
         <style>
             input {
                 width: 300px;
@@ -32,7 +31,7 @@
         <div class="container paper">
             <h2>用户注册</h2>
             <form role="form">
-                用户邮箱: <input type="text" id="name" name="name"> <br>
+                用户昵称: <input type="text" id="name" name="name"> <br>
                 用户密码: <input type="password" id="password" name="password"> <br>
                 确认密码: <input type="password" id="password1" name="password1"> <br>
             </form>
@@ -40,21 +39,24 @@
         </div>
         <script>
             $("#signup").click(function () {
-                var name = $("#name").val()
-                var password = $("#password").val()
-                var password1 = $("#password1").val()
+                var name = $("#name").val();
+                var password = $("#password").val();
+                var password1 = $("#password1").val();
 
                 if (password === password1) {
                     $.post({
-                        url: host + "/auth/register",
+                        url: host + "/api/auth/register",
                         contentType: "application/json; charset=UTF-8",
                         data: JSON.stringify({
-                            email: name,
-                            password
+                            userName: name,
+                            pwd: password
                         }),
                         success: function (data) {
-                            if (data.status === 10000) {
-                                toastr.success("我们已经将邮箱激活码发送到您的邮箱，请登录您的邮箱查看")
+                            if (data.code === 0) {
+                                toastr.success("注册成功，即将跳转回主页。")
+                                setTimeout(function () {
+                                    window.location.href = "index.html";
+                                }, 1000);
                             } else {
                                 toastr.warning(data.msg)
                             }

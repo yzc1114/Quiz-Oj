@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+
+    <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+    <script src="../static/js/common.js"></script>
+    <script>
+        function initAfterLoggedIn(){
+            getList(1)
+            $("#title").text("题目：" + $.cookie("ojQuestionTitle"));
+        }
+    </script>
+    <script>
+        $(function () {
+            checkIfLoggedIn(initAfterLoggedIn, ()=>{
+                window.location.href = "index.html"
+            })
+        })
+    </script>
+    <style>
+        #choose {
+            text-align: right;
+        }
+
+        #previous {
+            display: inline-block;
+            width: 100px;
+            font-size: 20px;
+        }
+
+        #page {
+            display: inline-block;
+            width: 50px;
+        }
+
+        #next {
+            display: inline-block;
+            width: 100px;
+            font-size: 20px;
+        }
+
+        #list {
+            text-align: right;
+        }
+
+        .titles {
+            color: #41403e;
+            font-family: Neucha, sans-serif;
+            font-size: 20px;
+            text-decoration: none;
+            background-image: none;
+        }
+
+        .titles:hover {
+            cursor: pointer;
+        }
+    </style>
+
+    <title>oj题目讨论区</title>
+</head>
+<body>
+<div id="navhead"></div>
+<script>
+    $("#navhead").load("navhead.html")
+</script>
+<div style="margin: 100px auto; width: 960px">
+    <div class="container paper">
+        <h1>讨论区</h1>
+        <h3 id="title"></h3>
+        <table id="list">
+            <tr>
+                <th>#</th>
+                <th>讨论内容</th>
+                <th>时间</th>
+            </tr>
+        </table>
+        <div id="choose" style="margin-top: 100px">
+            <button id="previous">上一页</button>
+            <button id="next">下一页</button>
+            <input id="page" type="text" value="1"/>
+            <button id="go">跳转</button>
+        </div>
+        <div class="row">
+            <div class="col sm-10 md-10 lg-10">
+                <div class="form-group">
+                    <label for="content">发起讨论</label>
+                    <textarea class="no-resize" style="width: 100%" id="content" placeholder="写下你的评论吧！"></textarea>
+                </div>
+            </div>
+            <div style="margin-top: 44px" class="col sm-2 md-2 lg-2">
+                <button onclick="onAddReview()" id="uploadReview">添加</button>
+            </div>
+        </div>
+    </div>
+    <div id="nav"></div>
+    <script>
+        $("#nav").load("navigation.html")
+    </script>
+</div>
+<script>
+    var nu = 0
+    localStorage.setItem("code", "")
+    let list = document.getElementById("list")
+    let pageNum = parseInt($("#page").val())
+    let newPage = 0
+    let tableHeader = "<tr>" +
+        "<th>昵称</th>" +
+        "<th></th>" +
+        "<th>时间</th>" +
+        "</tr>"
+    var ojId = $.cookie("ojQuestionId")
+    if(!(ojId && ojId.length > 5)){
+        window.location.href = "list.html";
+    }
+    function getList(pageNum) {
+        $.get({
+            url: host + "/api/review/getReview/" + $.cookie("ojQuestionId") + "/" + pageNum,
+            withCredentials: true,
+            async: true,
+            success: function (data) {
+                if(data.code !== 0){
+                    alert("error");
+                    return;
+                }
+                var lists = data.data
+                if (lists.length !== 0) {
+                    list.innerHTML = tableHeader
+                    for (let i = 0; i < lists.length; i++) {
+                        list.innerHTML += "<tr>" +
+                            "<td>" + lists[i].userInfo.userName + "</td>" +
+                            // "<td><a class='titles' id='" + lists[i].orderId + "' onclick='details(\"" + ojId + "\")'>" + lists[i].title + "</a></td>" +
+                            "<td style='text-align: left; width: 100%;'>" + lists[i].review + "</td>" +
+                            "<td>" + lists[i].createTime + "</td>" +
+                            "</tr>"
+                    }
+                    nu = 1
+                } else {
+                    nu = 0
+                }
+            },
+            error: function () {
+                alert("error")
+            }
+        })
+    }
+
+    $("#next").click(function () {
+        newPage = pageNum + 1
+        getList(newPage)
+        if (nu === 0) {
+            toastr.warning("已经是最后一页了！")
+        } else {
+            pageNum = newPage
+            $("#page").val(pageNum)
+            nu = 0
+        }
+        overed = false
+    })
+
+    $("#previous").click(function () {
+        if (pageNum === 1) {
+            toastr.warning("已经是第一页了！")
+        } else {
+            pageNum = pageNum - 1
+            getList(pageNum)
+            $("#page").val(pageNum)
+            nu = 0
+        }
+    })
+
+    $("#go").click(function () {
+        newPage = parseInt($("#page").val())
+        if(!Number.isInteger(newPage) || newPage <= 0){
+            toastr.warning("不存在改页")
+            $("#page").val(pageNum)
+            return;
+        }
+        getList(newPage)
+        if (nu === 0) {
+            toastr.warning("不存在改页")
+            $("#page").val(pageNum)
+        } else {
+            pageNum = newPage
+            nu = 0
+        }
+        overed = false
+    })
+    
+    function onAddReview(){
+        let review = $("#content").val();
+        console.log(review);
+        if(review.length > 100){
+            toastr.warning("评论过长！请输入长度小于100的字符串！");
+            return;
+        }
+        $.get({
+            url: host + "/api/review/addReview/" + $.cookie("ojQuestionId") + "/" + review,
+            withCredentials: true,
+            async: true,
+            success: function (data) {
+                if(data.code !== 0){
+                    alert("error");
+                    return;
+                }
+                window.location.href = "Review.html";
+            },
+            error: function () {
+                alert("error")
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

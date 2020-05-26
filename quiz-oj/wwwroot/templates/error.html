@@ -14,7 +14,7 @@
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
 
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+        <script src="../static/js/common.js"></script>
         <title>您的答案错误</title>
         <style>
             .clearfix::after, .clearfix::before {
@@ -25,11 +25,15 @@
         </style>
     </head>
     <body>
-        <div style="margin: 0 auto; width: 960px">
+        <div id="navhead"></div>
+        <script>
+            $("#navhead").load("navhead.html")
+        </script>
+        <div style="margin: 100px auto; width: 960px">
             <div class="container paper clearfix">
                 <div style="width: 960px">
                     <h2 class="text-danger">
-                        你的代码中有某些错误！！
+                        你的代码中有某些错误！
                     </h2>
                 </div>
                 <div>

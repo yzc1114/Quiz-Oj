@@ -11,15 +11,19 @@
         <meta name="theme-color" content="#ffffff">
         <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
         <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script src="../static/js/common.js"></script>
+        <script src="../static/js/toastr.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../static/css/toastr.min.css">
         <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
 
         <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
-
+    
         <script>
-            var host = "http://47.101.33.252:4869"
-            if ($.cookie("author") === undefined) {
-                window.location.href = "index.html"
-            }
+            $(function () {
+                checkIfLoggedIn(null, ()=>{
+                    window.location.href = "index.html"
+                })
+            })
         </script>
         <style>
             #leftTime {
@@ -106,48 +110,62 @@
         var options = document.getElementById("options")
         var scoreNow = document.getElementById("score")
         var score = 0;
-        var time = 60;
-        setInterval(function () {
-            leftTime.innerHTML = "剩余时间：<span>" + time + "</span>"
-            time--
-            if (time === -1) {
-                window.location.href = "result.html"
+        
+        var timer = null;
+        var stopTimer = function () {
+            clearInterval(timer);
+        }
+        var startTimer = function (initTime) {
+            let time = 60;
+            if(initTime){
+                time = initTime;
             }
-        }, 1000)
+            if(timer){
+                clearInterval(timer);
+            }
+            timer = setInterval(function () {
+                leftTime.innerHTML = "剩余时间：<span>" + time + "</span>"
+                time--
+                if (time < 0) {
+                    window.location.href = "result.html"
+                }
+            }, 1000)
+        };
+        
+        
 
         var showQues = function (question) {
-            if (question.typeId === 2 || question.typeId === 3) {
-                $.cookie("questionId", question.id)
-                stem.innerHTML = question.description
-                options.innerHTML = ""
-                let maxlength = 0
-                for (let i = 0; i < question.optionDTOList.length; i++) {
-                    if (question.optionDTOList[i].description.length > maxlength) {
-                        maxlength = question.optionDTOList[i].description.length
-                    }
-                    options.innerHTML += "<input type='radio' name='option' value='" + question.optionDTOList[i].id + "' id='"
-                        + question.optionDTOList[i].id + "'/>" + "<label for='" + question.optionDTOList[i].id + "'>" +
-                        question.optionDTOList[i].description + "</label>"
+            stem.innerHTML = question.description
+            options.innerHTML = ""
+            let maxlength = 0
+            for (let i = 0; i < question.optionDTOList.length; i++) {
+                if (question.optionDTOList[i].description.length > maxlength) {
+                    maxlength = question.optionDTOList[i].description.length
                 }
-
-                $("#options label").css("width", maxlength * 20 + 40 + "px")
-            } else if (question.typeId === 3) {
-
+                options.innerHTML += "<input type='radio' name='option' value='" + question.optionDTOList[i].id + "' id='"
+                    + question.optionDTOList[i].id + "'/>" + "<label for='" + question.optionDTOList[i].id + "'>" +
+                    question.optionDTOList[i].description + "</label>"
             }
+
+            $("#options label").css("width", maxlength * 20 + 40 + "px")
         }
 
-        var getQues = function () {
+        var getQues = function (successFn) {
             $.get({
                 url: host + "/api/quiz/list",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", $.cookie("author"));
-                },
+                withCredentials: true,
                 success: function (data) {
-                    if (data.status === 10001) {
+                    if (data.code === -1) {
                         alert("您当前不在答题状态，请退出后重试")
                         window.location.href = 'info.html'
+                    }
+                    else if(data.code === -2){
+                        timeout();
                     } else {
                         showQues(data.data)
+                        if(successFn){
+                            successFn();
+                        }
                     }
                 },
                 error: function () {
@@ -158,34 +176,26 @@
 
         $.post({
             url: host + "/api/quiz/start",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", $.cookie("author"));
-            },
+            withCredentials: true,
             success: function (data) {
-                if (data.status === 10001) {
+                if (data.code === -1) {
                     alert("您当前不在答题状态，请退出重试")
                     window.location.href = "info.html"
+                }else if(data.code === -2){
+                    timeout();
                 } else {
-                    if (data.data !== undefined) {
-                        if (typeof data.data !== "number") {
-                            alert("系统检测到您上次答题时意外退出，上次分数为" + data.data.score + ",本次答题将继续上次答题")
-                            score = data.data.score
-                            scoreNow.innerHTML = "当前分数：<span>" + score + "</span>"
-                            showQues(data.data.problemOutputDTO)
-                        } else {
-                            let msg = confirm("系统检测到您上次答题时意外退出，上次分数为" + data.data + ",系统已经自动帮您提交，点击确认进行本次答题")
-                            if (msg === true) {
-                                score = 0;
-                                scoreNow.innerHTML = "当前分数：<span>" + score + "</span>"
-                                getQues()
-                            } else {
-                                window.location.href = "info.html"
-                            }
-                        }
-                    } else {
+                    var quizStatus = data.data;
+                    if(quizStatus.ok){
                         score = 0;
                         scoreNow.innerHTML = "当前分数：<span>" + score + "</span>"
                         getQues()
+                        startTimer()
+                    }else if(quizStatus.continueLast){
+                        score = quizStatus.lastScore
+                        alert("系统检测到您上次答题时意外退出，上次分数为" + score + ",本次答题将继续上次答题")
+                        scoreNow.innerHTML = "当前分数：<span>" + score + "</span>"
+                        startTimer(quizStatus.lastRemainingSecs);
+                        showQues(quizStatus.lastQuizQuestion)
                     }
                 }
             },
@@ -195,32 +205,45 @@
         })
 
         $("#submit").click(function () {
-            let optionId = $('input:radio:checked').val()
+            let optionId = parseInt($('input:radio:checked').val())
             $.post({
                 url: host + "/api/quiz/validate",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", $.cookie("author"));
-                },
-                data: {
-                    pid: $.cookie("questionId"),
+                withCredentials: true,
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify({
                     optionId: optionId
-                },
+                }),
                 success: function (data) {
+                    if(data.code !== 0){
+                        if(data.code === -2){
+                            //超时！
+                            toastr.warning("已经超时！将导航到结果页面！")
+                            setTimeout(function () {
+                                window.location.href = "result.html"
+                            }, 500);
+                        }else{
+                            alert("error!")
+                        }
+                        return;
+                    }
                     let result = data.data
-                    if (result.result === false) {
-                        $('input[type="radio"]:checked+label').css("backgroundColor", "red")
-                        $('input[type="radio"]:checked+label').css("color", "white")
-
+                    var radioInput = $('input[type="radio"]:checked+label');
+                    if (result.correct === false) {
+                        radioInput.css("backgroundColor", "red")
+                        radioInput.css("color", "white")
+                        toastr.warning("回答错误！将导航到结果页面！")
                         setTimeout(function () {
                             window.location.href = "result.html"
                         }, 500)
                     } else {
+                        toastr.success("回答正确！")
                         score = score + 5;
                         scoreNow.innerHTML = "当前分数：<span>" + score + "</span>"
-                        $('input[type="radio"]:checked+label').css("backgroundColor", "rgb(165, 214, 46)")
-                        $('input[type="radio"]:checked+label').css("color", "white")
+                        radioInput.css("backgroundColor", "rgb(165, 214, 46)")
+                        radioInput.css("color", "white")
                         setTimeout(function () {
-                            getQues()
+                            stopTimer();
+                            getQues(startTimer)
                             time = 60
                         }, 500)
                     }
@@ -230,5 +253,11 @@
                 }
             })
         })
+        
+        var timeout = function () {
+            toastr.fatal("已超时！将导航到结果页面！")
+            window.location.href = "result.html"
+        }
+        
     </script>
 </html>
