@@ -19,7 +19,10 @@ namespace quiz_oj.Dao.impls
         
         public async Task<List<OjReview>> GetOjReview(string ojId, int page)
         {
-            return await dbContext.OjReviews.Where(r => r.OjId == ojId).Include(r => r.UserInfo)
+            return await dbContext.OjReviews
+                .Where(r => r.OjId == ojId)
+                .Include(r => r.UserInfo)
+                .OrderByDescending(r => r.CreateTime)
                 .Skip((page - 1) * 10).Take(10).ToListAsync();
         }
 

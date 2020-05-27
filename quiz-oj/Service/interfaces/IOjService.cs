@@ -14,5 +14,9 @@ namespace quiz_oj.Service.interfaces
         Task<OjResult> PendResult(string identifier, string questionId, string code);
 
         Task<bool> SaveSuccess(string userId, string questionId);
+
+        Task<bool> AddSubmitRecord(string userId, string ojId, string code, string info);
+
+        Task<List<OjSubmitRecord>> GetSubmitRecordList(string userId, int page);
     }
 }

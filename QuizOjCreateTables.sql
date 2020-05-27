@@ -9,6 +9,8 @@ drop table `OjSuccess`;
 drop table `OjSuccessCount`;
 drop table `QuizHighScore`;
 drop table `OjTestCase`;
+drop table `OjReview`;
+drop table `OjSubmitRecord`;
 
 -- 1
 Create Table `UserInfo`(
@@ -27,6 +29,7 @@ Create Table `OJ`(
     `code` Text,
     `difficulty` INT NOT NULL,
     `createTime` Datetime NOT NULL,
+    `orderId` INT unsigned,
     primary key (`id`),
     INDEX titleIndex (`title`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -81,4 +84,23 @@ Create Table `OjTestCase`(
 	`ojId` VARCHAR(35) NOT NULL references `OJ`(`id`),
     `testCaseJson` Text,
     primary key (`ojId`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 9
+Create Table `OjReview`(
+	`ojId` VARCHAR(35) NOT NULL references `OJ`(`id`),
+    `userId` VARCHAR(35) NOT NULL references `UserInfo`(`id`),
+    `review` VARCHAR(100) NOT NULL,
+	`createTime` DateTime,
+    primary key (`ojId`, `createTime`, `userId`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 10
+Create Table `OjSubmitRecord`(
+     `userId` VARCHAR(35) NOT NULL references `UserInfo`(`id`),
+     `ojId` VARCHAR(35) NOT NULL references `OJ`(`id`),
+     `code` TEXT NOT NULL,
+     `createTime` DateTime,
+     `info` VARCHAR(50),
+	 primary key (`userId`, `createTime`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

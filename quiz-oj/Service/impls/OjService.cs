@@ -47,5 +47,15 @@ namespace quiz_oj.Service.impls
         {
             return await ojDao.SaveSuccess(userId, questionId);
         }
+
+        public async Task<bool> AddSubmitRecord(string userId, string ojId, string code, string info)
+        {
+            return await ojDao.AddSubmitRecord(userId, ojId, code, info);
+        }
+
+        public async Task<List<OjSubmitRecord>> GetSubmitRecordList(string userId, int page)
+        {
+            return await ojDao.GetSubmitRecordList(userId, page);
+        }
     }
 }

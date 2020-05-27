@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,6 +142,34 @@ namespace quiz_oj.Dao.impls
         {
             var t = await dbContext.OjTestCaseTables.SingleOrDefaultAsync(q => q.OjId == ojQuestionId);
             return t?.TestCaseSetJson;
+        }
+
+
+        public async Task<bool> AddSubmitRecord(string userId, string ojId, string code, string info)
+        {
+            await dbContext.OjSubmitRecords.AddAsync(new OjSubmitRecord
+            {
+                UserId = userId, Code = code, CreateTime = DateTime.Now, Info = info, OjId = ojId
+            });
+            await dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<OjSubmitRecord>> GetSubmitRecordList(string userId, int page)
+        {
+            return await dbContext.OjSubmitRecords
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(p => p.CreateTime)
+                .Skip((page - 1) * 10)
+                .Take(10).Join(dbContext.OjQuestions, s => s.OjId, o => o.Id, (s, o) => new OjSubmitRecord
+                {
+                    UserId = s.UserId,
+                    Code = s.Code,
+                    CreateTime = s.CreateTime,
+                    Info = s.Info,
+                    OjId = s.OjId,
+                    OjTitle = o.Title
+                }).ToListAsync();
         }
     }
     

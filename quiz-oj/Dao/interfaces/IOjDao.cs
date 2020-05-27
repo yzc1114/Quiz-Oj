@@ -14,5 +14,9 @@ namespace quiz_oj.Dao.interfaces
         Task<string> UploadOj(OjQuestion question, OjTestCaseTable ojTestCaseTable);
         Task<bool> FixOjOrderId();
         Task<string> GetTestCase(string ojQuestionId);
+
+        Task<bool> AddSubmitRecord(string userId, string ojId, string code, string info);
+
+        Task<List<OjSubmitRecord>> GetSubmitRecordList(string userId, int page);
     }
 }

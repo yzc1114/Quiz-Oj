@@ -32,7 +32,7 @@ namespace quiz_oj.DynamicCodeExecutor
                 });
                 var cases = ojTestCaseSet.Params.Length;
                 var pass = cases == successes;
-                var successRate = successes * 1.0 / cases;
+                var successRate = 100 * successes * 1.0 / cases;
                 return new OjResult
                 {
                     Pass = pass,

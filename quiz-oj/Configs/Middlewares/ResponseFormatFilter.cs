@@ -9,21 +9,20 @@ namespace quiz_oj.Configs.Middlewares
     {
         public override void OnResultExecuting(ResultExecutingContext context)
         {
-            if (context.Result is ObjectResult)
+            switch (context.Result)
             {
-                var objectResult = context.Result as ObjectResult;
-                if (objectResult == null)
+                case RedirectResult _:
+                    return;
+                case ObjectResult o:
                 {
-                    context.Result = new ObjectResult(new ResponseFormat(code: 0, message: null, data: null));
-                }
-                else
-                {
+                    var objectResult = o;
                     context.Result = new ObjectResult(new ResponseFormat(code: 0, message: null, data: objectResult.Value));
+
+                    break;
                 }
-            } 
-            else
-            {
-                Trace.Fail("Please debug. We don't support non ObjectResult");
+                default:
+                    Trace.Fail("Please debug. We don't support non ObjectResult");
+                    break;
             }
         }
     }

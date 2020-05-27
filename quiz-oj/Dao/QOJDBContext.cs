@@ -30,6 +30,7 @@ namespace quiz_oj.Dao
                 r.HasOne(d => d.UserInfo).WithMany().HasForeignKey(e => e.UserId);
             });
             modelBuilder.Entity<OjReview>().HasKey(p => new {p.OjId, p.CreateTime, p.UserId});
+            modelBuilder.Entity<OjSubmitRecord>().HasKey(p => new {p.UserId, p.CreateTime});
         }
 
         public DbSet<UserInfo> UserInfos { get; set; }
@@ -41,5 +42,7 @@ namespace quiz_oj.Dao
         public DbSet<QuizHighScore> QuizHighScores { get; set; }
         public DbSet<OjTestCaseTable> OjTestCaseTables { get; set; }
         public DbSet<OjReview> OjReviews { get; set; }
+        
+        public DbSet<OjSubmitRecord> OjSubmitRecords { get; set; }
     }
 }

@@ -43,7 +43,7 @@ namespace quiz_oj
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://localhost:7070");
+                    webBuilder.UseUrls("http://*:7070");
                 });
     }
 }
