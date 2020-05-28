@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>quiz答题排行榜</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon-32x32.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="../static/favicon-16x16.ico">
+    <meta name="theme-color" content="#ffffff">
+    <script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/paper.css">
+    <script src="https://cdn.bootcss.com/ace/1.4.2/ace.js"></script>
+    <script src="https://cdn.bootcss.com/ace/1.4.2/ext-language_tools.js"></script>
+    <script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
+
+    <link rel="stylesheet" type="text/css" href="../static/css/custom.css">
+
+    <script src="../static/js/common.js"></script>
+    <script>
+        $(function () {
+            checkIfLoggedIn(null, ()=>{
+                window.location.href = "index.html"
+            })
+        })
+    </script>
+    <style>
+        .container {
+            background-color: rgb(250, 250, 250);
+        }
+    </style>
+</head>
+<body>
+<div id="navhead"></div>
+<script>
+    $("#navhead").load("navhead.html")
+</script>
+<div style="margin: 100px auto; width: 960px">
+    <div class="container paper">
+
+        <div>
+            <div class="row flex-center">
+                <div class="text-center">
+                    <h1>Upload Quiz</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col sm-12 md-12 lg-12">
+                    <div class="form-group">
+                        <label for="content">Question Description</label>
+                        <textarea style="width: 100%" id="content"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col md-8 sm-8">
+                    <div class="form-group">
+                        <label for="correctAnswer">Correct Answer</label>
+                        <input class="input-block" type="text" id="correctAnswer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col md-2 sm-2 lg-2 form-group">
+                    <label for="wrongAnswerCount">Wrong Answer Count</label>
+                    <select oninput="onSelectTestCaseCount(this)" id="wrongAnswerCount">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div style="padding-bottom: 0; padding-top: 0; margin-bottom: 0; margin-top: 0" class="col lg-12 sm-12 md-12 row">
+                    <p>Wrong Answers</p>
+                </div>
+                <div style="padding-top: 0; margin-top: 0" id="wrongAnswers" class="col lg-12 sm-12 md-12 row">
+                    <div class="col lg-8 sm-8 md-8">
+                        <div class="form-group">
+                            <input class="input-block" type="text">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-8">
+                    <button onclick="onUpload()" class="btn-block">Upload</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="nav"></div>
+    <!--    <iframe src="navigation.html">-->
+    </iframe>
+    <script>
+        $("#nav").load("navigation.html")
+    </script>
+    <script>
+        function onSelectTestCaseCount() {
+            let count = parseInt($("#wrongAnswerCount").val());
+            let params = $("#wrongAnswers");
+            let template = 
+                "                            <div style='padding-bottom: 0; padding-top: 0; margin-bottom: 0; margin-top: 0' class=\"col lg-8 sm-8 md-8\">\n" +
+                "                                <div class=\"form-group\">\n" +
+                "                                    <input class=\"input-block\" type=\"text\">\n" +
+                "                                </div>\n" +
+                "                            </div>";
+            template.repeat(count)
+            params.html(template.repeat(count));
+        }
+
+        function onUpload(){
+            let content = $("#content").val();
+            let correctAnswer = $("#correctAnswer").val();
+            let wrongAnswerCount = parseInt($("#wrongAnswerCount").val());
+            
+            let inputs = document.getElementById("wrongAnswers").getElementsByTagName("input");
+            let answers = []
+            answers.push(correctAnswer);
+            for(let i = 0; i < wrongAnswerCount; i++){
+                let wrongAnswer = inputs[i].value;
+                answers.push(wrongAnswer);
+            }
+            answers.sort(function() {
+                return (0.5-Math.random());
+            });
+            let correctIndex = answers.indexOf(correctAnswer);
+            let optionDTOList = [];
+            for(let i = 0; i < answers.length; i++){
+                optionDTOList.push({
+                    "id": i + 1,
+                    "description": answers[i],
+                    "correct": i === correctIndex
+                })
+            }
+
+            let data = {
+                "description": content,
+                "optionDTOList": optionDTOList
+            }
+
+            $.post({
+                url: host + "/api/upload/quiz",
+                contentType: "application/json; charset=UTF-8",
+                withCredentials: true,
+                data: JSON.stringify(data),
+                success: function (data) {
+                    toastr.clear();
+                    toastr.info("正在上传...");
+                    if(data.code !== 0){
+                        alert("error!")
+                        toastr.warning("出错了！")
+                        return;
+                    }
+                    if(data.data === true){
+                        toastr.success("上传成功！")
+                    }else{
+                        toastr.warning("上传失败！")
+                    }
+                }
+            })
+        }
+    </script>
+</div>
+</body>
+</html>

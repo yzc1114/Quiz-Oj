@@ -202,7 +202,7 @@
                                     return;
                                 }
                                 let detail = data.data;
-                                let description = detail.content;
+                                let description = detail.content.replace(/\n/g, "<br>");
                                 let code = detail.code;
                                 if (localStorage.getItem("code") !== "" && localStorage.getItem("code") !== undefined) {
                                     editor.setValue(localStorage.getItem("code"))

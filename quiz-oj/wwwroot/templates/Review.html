@@ -116,7 +116,7 @@
     let list = document.getElementById("list")
     let pageNum = parseInt($("#page").val())
     let newPage = 0
-    let tableHeader = "<tr>" +
+    let tableHeader = "<tr style='text-align: left'>" +
         "<th>昵称</th>" +
         "<th></th>" +
         "<th>时间</th>" +
@@ -140,10 +140,10 @@
                     list.innerHTML = tableHeader
                     for (let i = 0; i < lists.length; i++) {
                         list.innerHTML += "<tr>" +
-                            "<td>" + lists[i].userInfo.userName + "</td>" +
+                            "<td style='text-align: left; width: 20%;'>" + lists[i].userInfo.userName + "</td>" +
                             // "<td><a class='titles' id='" + lists[i].orderId + "' onclick='details(\"" + ojId + "\")'>" + lists[i].title + "</a></td>" +
-                            "<td style='text-align: left; width: 100%;'>" + lists[i].review + "</td>" +
-                            "<td>" + lists[i].createTime + "</td>" +
+                            "<td style='text-align: left; width: 60%;'>" + lists[i].review + "</td>" +
+                            "<td style='text-align: left; width: 20%;'>" + lists[i].createTime + "</td>" +
                             "</tr>"
                     }
                     nu = 1
