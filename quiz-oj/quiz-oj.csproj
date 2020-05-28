@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>quiz_oj</RootNamespace>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
 
@@ -44,5 +45,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0-rc1.final" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="CLRClassLib">
+      <HintPath>..\..\CLRClassLib\x64\Release\CLRClassLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

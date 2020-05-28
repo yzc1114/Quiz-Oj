@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using quiz_oj.Configs.Exceptions;
 using quiz_oj.IndependentNS;
+using System.Runtime.InteropServices;
 
 namespace quiz_oj.Entities.OJ
 {
@@ -22,6 +23,10 @@ namespace quiz_oj.Entities.OJ
 
     public class OjTestCaseSet
     {
+
+        [DllImport("TestATL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool CheckListNodeStrValidity(string s);
+
         [AllowNull]
         public string OjId { get; set; }
         public string Title { get; set; }

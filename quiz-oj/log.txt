@@ -1,0 +1,3 @@
+2020年5月28日, 星期四 First Line
+2020年5月28日, 星期四 Microsoft.AspNetCore.Http.DefaultHttpRequest
+2020年5月28日, 星期四 https://localhost:7070/api/Auth/checkUserNameExists/yzc

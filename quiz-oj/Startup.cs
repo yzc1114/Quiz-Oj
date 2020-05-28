@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CLRClassLib;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -51,6 +52,7 @@ namespace quiz_oj
                 options.RespectBrowserAcceptHeader = true;
             });
             services.AddSingleton<SessionUtils, SessionUtils>();
+            services.AddSingleton<Logger, Logger>();
             ConfigureDaos(services);
             ConfigureControllerServices(services);
             ConfigureDynamicCodeExecutor(services);
@@ -97,6 +99,7 @@ namespace quiz_oj
             });
             app.UseRouting();
             app.UseSession();
+            app.UseLoggerMiddleware();
             //app.UseErrorHandling();
             app.UseEndpoints(endpoints =>
             {
