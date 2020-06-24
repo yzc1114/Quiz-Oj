@@ -100,7 +100,7 @@ namespace quiz_oj
             app.UseRouting();
             app.UseSession();
             app.UseLoggerMiddleware();
-            //app.UseErrorHandling();
+            app.UseErrorHandling();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

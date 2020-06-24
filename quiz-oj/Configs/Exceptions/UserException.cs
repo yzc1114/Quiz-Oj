@@ -1,5 +1,5 @@
 using System;
-
+using MyExceptionLibrary.ExceptionLibrary;
 namespace quiz_oj.Configs.Exceptions
 {
     public class UserException : CodableException

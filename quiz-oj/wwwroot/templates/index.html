@@ -94,9 +94,9 @@
                                         toastr.success("正在登录中...");
                                         setTimeout(function () {//做延时以便显示登录状态值\
                                             window.location.href = "rank.html";//指向登录的页面地址
-                                        }, 1000)
+                                        }, 500)
                                     } else {
-                                        toastr.warning(data.message);//显示登录失败的原因
+                                        toastr.warning("登陆失败！请检查用户名和密码是否正确！");//显示登录失败的原因
                                         return false;
                                     }
                                 }

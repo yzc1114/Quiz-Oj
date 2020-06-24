@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using quiz_oj.Configs.Exceptions;
+using System.Runtime.InteropServices;
 
 namespace quiz_oj.IndependentNS
 {
@@ -42,6 +43,10 @@ namespace quiz_oj.IndependentNS
 
     public static class DataStructureParser
     {
+
+        [DllImport("TreeNodeStrChecker", EntryPoint = "isValidTreeNodeString", CallingConvention = CallingConvention.StdCall)]
+        private static extern bool IsValidTreeNodeString(string arg);
+
         public static ListNode ParseListNode(string val)
         {
             val = val.Trim();
@@ -72,6 +77,11 @@ namespace quiz_oj.IndependentNS
         }
         public static TreeNode ParseTreeNode(string val)
         {
+            if (!IsValidTreeNodeString(val)) 
+            {
+                Console.WriteLine("Parse Tree Node failed!");
+            }
+            Console.WriteLine("Parse Tree Node succeed.");
             return new TreeNode(1);
         }
     }

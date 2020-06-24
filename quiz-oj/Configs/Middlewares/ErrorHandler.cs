@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using quiz_oj.Configs.Exceptions;
+using MyExceptionLibrary.ExceptionLibrary;
 
 namespace quiz_oj.Configs.Middlewares
 {

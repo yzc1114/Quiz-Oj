@@ -7,12 +7,14 @@ namespace quiz_oj
 {
     public class Program
     {
-        [DllImport("TestATL.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MyAdd(int a, int b);
+        [DllImport("TreeNodeStrChecker.dll", CallingConvention = CallingConvention.StdCall)]
+        public static extern bool isValidTreeNodeString(string s);
+
         public static void Main(string[] args)
         {
-            Console.WriteLine(MyAdd(1, 2));
-            //CreateHostBuilder(args).Build().Run();
+            //Console.WriteLine(isValidTreeNodeString("[1,2,4,null]"));
+            //Console.WriteLine(add(1));
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -20,7 +22,8 @@ namespace quiz_oj
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("https://*:7070");
+                    webBuilder.UseKestrel();
+                    webBuilder.UseUrls("http://*:7070");
                 });
     }
 }
